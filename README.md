@@ -1,9 +1,16 @@
 # purple_exporter
 
 purple_exporter is a basic Prometheus exporter that exports information from
-a specified series of PurpleAir sensors.
+a single PAII Purple Air Sensor.
 
-## Requirements for Use
+This project was developed so I could pipe the information from my own PAII
+sensor to a grafana chart I run in my house. In the future, I may expand the
+usability of this exporter to other PA sensors, or ranges of sensors.
+
+## Getting Started
+
+### What you'll need
+- A PurpleAir API Key
 
 Get a PurpleAir API key
 
