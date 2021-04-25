@@ -9,5 +9,7 @@ edition = "2018"
 [dependencies]
 prometheus_exporter = "0.8"
 env_logger = "0.8"
+json = "0.12.4"
 log = { version = "0.4" }
 reqwest = { version = "0.10", features = ["blocking"]}
+url = "2.2.1"
