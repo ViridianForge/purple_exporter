@@ -5,6 +5,8 @@ use reqwest::header;
 use reqwest::blocking::Client;
 use url::Url;
 
+use clap::{Arg, App};
+
 // Metrics - should be grabbed from a single API call. Calls should be limited
 // to only as often as Purple Requests (1-10 Minutes)
 // Make absolutely sure that requests for multiple sensors are fit into a single
@@ -58,10 +60,43 @@ fn get_reading(raw_resp:String) -> Reading{
 
 fn main() {
 
-    //Set up configuration items
-    let update_frequency = std::time::Duration::from_secs(300);
-    let sensor_index = String::from("REDACTED");
-    let purple_read_key = String::from("REDACTED");
+    // Use Clap to setup App configuration
+    let args = App::new("Purple Exporter")
+        .version("0.1.0")
+        .author("ViridianForge <wayne@viridianforge.tech")
+        .about("Purple Air API Prometheus Exporter")
+        .arg(Arg::with_name("rate")
+            .short("r")
+            .long("rate")
+            .takes_value(true)
+            .help("How often to query Purple API (seconds, min 300)"))
+        .arg(Arg::with_name("sensor")
+            .short("s")
+            .long("sensor")
+            .takes_value(true)
+            .help("Purple Air Sensor to get readings from (string)"))
+        .arg(Arg::with_name("readkey")
+            .short("x")
+            .long("readkey")
+            .takes_value(true)
+            .help("API Read Key for Purple Air API (string)"))
+        .get_matches();
+
+    // Set up configuration items
+    let rate_string = args.value_of("rate").unwrap_or("300");
+    let sensor_index = args.value_of("sensor").unwrap_or("Invalid or missing Sensor Index");
+    let purple_read_key = args.value_of("readkey").expect("Invalid or missing API Read Key");
+
+    // First Parse Request Pacing Safely
+    let mut request_rate:u64 = rate_string.parse().expect("Invalid request rate.");
+
+    // Purple asks that API requests be limited to at least once every five minutes
+    if request_rate < 300 {
+        print!("Invalid API Request Rate set, defaulting to 300 seconds.");
+        request_rate = 300;
+    }
+
+    let update_frequency = std::time::Duration::from_secs(request_rate);
 
     // Build Headers
     let mut headers = header::HeaderMap::new();

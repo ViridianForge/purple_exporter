@@ -19,7 +19,16 @@ sensor.
 
 ## Running the Exporter
 
-_Command Line Instructions go here_
+To start the exporter from the command line:
+`cargo run -- -r rate -s sensor_index -x API_read_key`
+
+Where `rate` is how often to query the purple air API, in seconds. This will
+default to a minimum of once every 300 seconds (5 minutes).
+
+`sensor_index` is the unique index assigned by Purple to the sensor to draw
+readings from.
+
+`API_read_key` is the Purple Air API Key mentioned above.
 
 ### Exposed Metrics
 
