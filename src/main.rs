@@ -7,55 +7,70 @@ use url::Url;
 
 use clap::{Arg, App};
 
-// Metrics - should be grabbed from a single API call. Calls should be limited
-// to only as often as Purple Requests (1-10 Minutes)
-// Make absolutely sure that requests for multiple sensors are fit into a single
-// request.
-
-// Convert docs to MD
+/// Container for a subset of sensor readings from a Purple Air sensor
+/// Currently supported are:
+/// # Atmospheric
+/// * `atmo_sen_a[0]` -- Humidity
+/// * `atmo_sen_a[1]` -- Temperature
+/// * `atmo_sen_a[2]` -- Air Pressure
+/// # Particle Concentration - Sensors A and B
+/// * `pm_sen_a[0]` -- Concentration of particles no larger than 1 micron in diameter
+/// * `pm_sen_a[1]` -- Concentration of particles no larger than 2.5 microns in diameter
+/// * `pm_sen_a[2]` -- Concentration of particles no larger than 10.0 microns in diameter
+/// # Particle Count - Sensors A and B
+/// * `ct_sen_a[0]` -- Count of particles no lager than 0.3 microns in diameter
+/// * `ct_sen_a[1]` -- Count of particles no lager than 0.5 microns in diameter
+/// * `ct_sen_a[2]` -- Count of particles no lager than 1.0 microns in diameter
+/// * `ct_sen_a[3]` -- Count of particles no lager than 2.5 microns in diameter
+/// * `ct_sen_a[4]` -- Count of particles no lager than 5.0 microns in diameter
+/// * `ct_sen_a[5]` -- Count of particles no lager than 10.0 microns in diameter
 struct Reading{
-    humidity: f32,
-    temperature: f32,
-    pressure: f32,
+    atmo_sen_a: Vec<f32>,
     pm_sen_a: Vec<f32>,
     pm_sen_b: Vec<f32>,
     ct_sen_a: Vec<f32>,
     ct_sen_b: Vec<f32>
 }
 
-// Retrieves a reading from the PurpleAPI sensor API end point
-// The response from this is used to update the outputs of the exporter
+/// Returns a Reading constructed from a response from the Purple Air API
+/// # Arguments
+/// * `raw_resp` - Response from Purple Air API as a String
+/// # Returns
+/// * `Reading` - A Reading struct parsed from `raw_resp`
 fn get_reading(raw_resp:String) -> Reading{
 
     // Convert Raw Response to JSON
-    let json_response = json::parse(&raw_resp).unwrap();
+    let sensor_response = json::parse(&raw_resp).expect("Invalid Sensor Response").remove("sensor");
+
+    // Assemble vectors for struct from components of the raw JSON response
+    let atmo_sen_vec = parse_response(&sensor_response, vec![String::from("humidity_a"),String::from("temperature_a"),String::from("pressure_a")]);
+    let pm_sen_a_vec = parse_response(&sensor_response, vec![String::from("pm1.0_a"), String::from("pm2.5_a"), String::from("pm10.0_a")]);
+    let pm_sen_b_vec = parse_response(&sensor_response, vec![String::from("pm1.0_b"), String::from("pm2.5_b"), String::from("pm10.0_b")]);
+    let ct_sen_a_vec = parse_response(&sensor_response, vec![String::from("0.3_um_count_a"), String::from("0.5_um_count_a"),
+        String::from("1.0_um_count_a"), String::from("2.5_um_count_a"), String::from("5.0_um_count_a"), String::from("10.0_um_count_a")]);
+    let ct_sen_b_vec = parse_response(&sensor_response, vec![String::from("0.3_um_count_b"), String::from("0.5_um_count_b"),
+        String::from("1.0_um_count_b"), String::from("2.5_um_count_b"), String::from("5.0_um_count_b"), String::from("10.0_um_count_b")]);
 
     //Need to convert this response into a proper form
     let reading = Reading{
-        humidity: json_response["sensor"]["humidity_a"].as_f32().unwrap(),
-        temperature: json_response["sensor"]["temperature_a"].as_f32().unwrap(),
-        pressure: json_response["sensor"]["pressure_a"].as_f32().unwrap(),
-        pm_sen_a: vec![json_response["sensor"]["pm1.0_a"].as_f32().unwrap(),
-            json_response["sensor"]["pm2.5_a"].as_f32().unwrap(), 
-            json_response["sensor"]["pm10.0_a"].as_f32().unwrap()],
-        pm_sen_b: vec![json_response["sensor"]["pm1.0_b"].as_f32().unwrap(),
-            json_response["sensor"]["pm2.5_b"].as_f32().unwrap(), 
-            json_response["sensor"]["pm10.0_b"].as_f32().unwrap()],
-        ct_sen_a: vec![json_response["sensor"]["0.3_um_count_a"].as_f32().unwrap(),
-            json_response["sensor"]["0.5_um_count_a"].as_f32().unwrap(), 
-            json_response["sensor"]["1.0_um_count_a"].as_f32().unwrap(), 
-            json_response["sensor"]["2.5_um_count_a"].as_f32().unwrap(), 
-            json_response["sensor"]["5.0_um_count_a"].as_f32().unwrap(), 
-            json_response["sensor"]["10.0_um_count_a"].as_f32().unwrap()],
-        ct_sen_b: vec![json_response["sensor"]["0.3_um_count_b"].as_f32().unwrap(),
-            json_response["sensor"]["0.5_um_count_b"].as_f32().unwrap(), 
-            json_response["sensor"]["1.0_um_count_b"].as_f32().unwrap(), 
-            json_response["sensor"]["2.5_um_count_b"].as_f32().unwrap(), 
-            json_response["sensor"]["5.0_um_count_b"].as_f32().unwrap(), 
-            json_response["sensor"]["10.0_um_count_b"].as_f32().unwrap()],
+        atmo_sen_a: atmo_sen_vec,
+        pm_sen_a: pm_sen_a_vec,
+        pm_sen_b: pm_sen_b_vec,
+        ct_sen_a: ct_sen_a_vec,
+        ct_sen_b: ct_sen_b_vec
     };
 
     return reading;
+}
+
+/// Create a `Vec<f32>` from a list of 
+/// # Arguments
+/// * `sensor_response` - All Purple Air Sensor readings, as a JSON object
+/// * `keys` - `Vec<String>` of keys in `sensor_response` to assemble into returned array
+/// # Returns
+/// * `Vec<f32>` - values associated with `keys` as `f32`. Values default to `-1.0` if the transformation fails.
+fn parse_response(sensor_response:&json::JsonValue, keys:Vec<String>) -> Vec<f32>{
+    return keys.iter().map(|index| sensor_response[index].as_f32().unwrap_or(-1.0)).collect();
 }
 
 fn main() {
@@ -84,7 +99,7 @@ fn main() {
 
     // Set up configuration items
     let rate_string = args.value_of("rate").unwrap_or("300");
-    let sensor_index = args.value_of("sensor").unwrap_or("Invalid or missing Sensor Index");
+    let sensor_index = args.value_of("sensor").expect("Invalid or missing Sensor Index");
     let purple_read_key = args.value_of("readkey").expect("Invalid or missing API Read Key");
 
     // First Parse Request Pacing Safely
@@ -111,7 +126,7 @@ fn main() {
     let raw_addr = "0.0.0.0:9184";
     let addr : SocketAddr = raw_addr.parse().expect("Listening Address Could Not Be Parsed.");
 
-    //Set up Metrics
+    // Set up Metrics
 
     // Atmospherics
     let humidity_gauge = register_gauge!("Humidity", "Humidity Measured by Sensor").expect("Cannot create Humidity gauge.");
@@ -140,14 +155,14 @@ fn main() {
     let count_ten_a = register_gauge!("Count_10_0_A", "Sensor A Count of Particles less than 10.0 microns in diameter").expect("Cannot create 10.0 Micron Count gauge A.");
     let count_ten_b = register_gauge!("Count_10_0_B", "Sensor B Count of Particles less than 10.0 microns in diameter").expect("Cannot create 10.0 Micron Count gauge B.");
 
-    //Start exporter
+    // Start exporter
     let purple_exporter = prometheus_exporter::start(addr).expect("Cannot start exporter.");
 
     loop{
-        //Do the things!
+        // Do the things!
         println!("Starting the loop!");
 
-        //Build URL used in GETs
+        // Build URL used in GETs
         let mut url_string = "https://api.purpleair.com/v1/sensors/".to_owned();
         url_string.push_str(&sensor_index);
 
@@ -155,7 +170,7 @@ fn main() {
 
         println!("Attempting to get a reading.");
 
-        //Get a reading        
+        // Get a reading        
         let raw_resp = client.get(sensor_url).send()
             .expect("Response from PurpleAPI could not be retrieved.")
             .text()
@@ -165,12 +180,12 @@ fn main() {
 
         let reading = get_reading(raw_resp);
 
-        //Update Atmospherics
-        humidity_gauge.set(reading.humidity.into());
-        temperature_gauge.set(reading.temperature.into());
-        pressure_gauge.set(reading.pressure.into());
+        // Update Atmospherics
+        humidity_gauge.set(reading.atmo_sen_a[0].into());
+        temperature_gauge.set(reading.atmo_sen_a[1].into());
+        pressure_gauge.set(reading.atmo_sen_a[2].into());
 
-        //Update Mass Concentrations
+        // Update Mass Concentrations
         mass_one_a.set(reading.pm_sen_a[0].into());
         mass_one_b.set(reading.pm_sen_b[0].into());
         mass_two_a.set(reading.pm_sen_a[1].into());
@@ -178,7 +193,7 @@ fn main() {
         mass_ten_a.set(reading.pm_sen_a[2].into());
         mass_ten_b.set(reading.pm_sen_b[2].into());
 
-        //Update Particle Counts
+        // Update Particle Counts
         count_pthree_a.set(reading.ct_sen_a[0].into());
         count_pthree_b.set(reading.ct_sen_b[0].into());
         count_pfive_a.set(reading.ct_sen_a[1].into());
