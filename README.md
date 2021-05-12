@@ -20,7 +20,7 @@ sensor.
 ## Running the Exporter
 
 To start the exporter from the command line:
-`cargo run -- -r rate -s sensor_index -x API_read_key`
+`cargo run -- -r rate -s sensor_index -x API_read_key -p port -a adjust`
 
 Where `rate` is how often to query the purple air API, in seconds. This will
 default to a minimum of once every 300 seconds (5 minutes).
@@ -30,15 +30,22 @@ readings from.
 
 `API_read_key` is the Purple Air API Key mentioned above.
 
+`port` is the network port the exporter will serve its data from.
+
+`adjust` is a flag used to indicate whether humidity and temperature readings
+should be adjusted to reflect likely ambient readings rather than readings in
+the sensor housing. Sensor readings are, on average, 8F hotter and 4% drier.
+Valid values are `true` or `false`, and will default to `false`.
+
 ### Exposed Metrics
 
 Metrics are collected from all sensors for which they are available.
 
 #### Environmental Data
 
-- Humidity
-- Temperature
-- Air Pressure
+- Humidity: Relative humidity in the sensor chamber, on average, 4% lower than ambient humidity
+- Temperature: Temperature in the sensor chamber in Farenheit, on average 8F higher than ambient temperature
+- Air Pressure: Current pressure in millibars
 
 #### Estimated Mass Concentrations
 

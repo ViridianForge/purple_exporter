@@ -5,7 +5,8 @@ use reqwest::header;
 use reqwest::blocking::Client;
 use url::Url;
 
-use clap::{Arg, App};
+#[macro_use]
+extern crate clap;
 
 /// Container for a subset of sensor readings from a Purple Air sensor
 /// Currently supported are:
@@ -37,19 +38,25 @@ struct Reading{
 /// * `raw_resp` - Response from Purple Air API as a String
 /// # Returns
 /// * `Reading` - A Reading struct parsed from `raw_resp`
-fn get_reading(raw_resp:String) -> Reading{
+fn get_reading(raw_resp:String, adjust:bool) -> Reading{
 
     // Convert Raw Response to JSON
     let sensor_response = json::parse(&raw_resp).expect("Invalid Sensor Response").remove("sensor");
 
     // Assemble vectors for struct from components of the raw JSON response
-    let atmo_sen_vec = parse_response(&sensor_response, vec![String::from("humidity_a"),String::from("temperature_a"),String::from("pressure_a")]);
+    let mut atmo_sen_vec = parse_response(&sensor_response, vec![String::from("humidity_a"),String::from("temperature_a"),String::from("pressure_a")]);
     let pm_sen_a_vec = parse_response(&sensor_response, vec![String::from("pm1.0_a"), String::from("pm2.5_a"), String::from("pm10.0_a")]);
     let pm_sen_b_vec = parse_response(&sensor_response, vec![String::from("pm1.0_b"), String::from("pm2.5_b"), String::from("pm10.0_b")]);
     let ct_sen_a_vec = parse_response(&sensor_response, vec![String::from("0.3_um_count_a"), String::from("0.5_um_count_a"),
         String::from("1.0_um_count_a"), String::from("2.5_um_count_a"), String::from("5.0_um_count_a"), String::from("10.0_um_count_a")]);
     let ct_sen_b_vec = parse_response(&sensor_response, vec![String::from("0.3_um_count_b"), String::from("0.5_um_count_b"),
         String::from("1.0_um_count_b"), String::from("2.5_um_count_b"), String::from("5.0_um_count_b"), String::from("10.0_um_count_b")]);
+
+    // Apply adjustments to temperature and humidity if requested
+    if adjust {
+        atmo_sen_vec[0] += 4.0;
+        atmo_sen_vec[1] -= 8.0;
+    }
 
     //Need to convert this response into a proper form
     let reading = Reading{
@@ -76,34 +83,29 @@ fn parse_response(sensor_response:&json::JsonValue, keys:Vec<String>) -> Vec<f32
 fn main() {
 
     // Use Clap to setup App configuration
-    let args = App::new("Purple Exporter")
-        .version("0.1.0")
-        .author("ViridianForge <wayne@viridianforge.tech")
-        .about("Purple Air API Prometheus Exporter")
-        .arg(Arg::with_name("rate")
-            .short("r")
-            .long("rate")
-            .takes_value(true)
-            .help("How often to query Purple API (seconds, min 300)"))
-        .arg(Arg::with_name("sensor")
-            .short("s")
-            .long("sensor")
-            .takes_value(true)
-            .help("Purple Air Sensor to get readings from (string)"))
-        .arg(Arg::with_name("readkey")
-            .short("x")
-            .long("readkey")
-            .takes_value(true)
-            .help("API Read Key for Purple Air API (string)"))
-        .get_matches();
+    let args = clap_app!(myapp => 
+        (version: "0.2.0")
+        (author: "Wayne Manselle <wayne@viridianforge.tech")
+        (about: "Purple Air API Prometheus Exporter")
+        (@arg rate: -r --rate +takes_value "How often to query Purple API (seconds, min 300)")
+        (@arg sensor: -s --sensor +takes_value "Purple Air Sensor to get readings from (string)")
+        (@arg readkey: -x --readkey +takes_value "API Read Key for Purple Air API (string)")
+        (@arg port: -p --port +takes_value "Port for exporter to listen on (string)")
+        (@arg adjust: -a --adjust +takes_value "Adjust humidity and temperature to reflect ambient air")
+    ).get_matches();
 
     // Set up configuration items
+    let port_string = args.value_of("port").unwrap_or("9184");
+    let adjust_string = args.value_of("adjust").unwrap_or("false");
     let rate_string = args.value_of("rate").unwrap_or("300");
     let sensor_index = args.value_of("sensor").expect("Invalid or missing Sensor Index");
     let purple_read_key = args.value_of("readkey").expect("Invalid or missing API Read Key");
 
     // First Parse Request Pacing Safely
     let mut request_rate:u64 = rate_string.parse().expect("Invalid request rate.");
+
+    // Set Ambient Adjustment Flag
+    let adjust_flag:bool = adjust_string.parse().unwrap_or(false);
 
     // Purple asks that API requests be limited to at least once every five minutes
     if request_rate < 300 {
@@ -123,7 +125,7 @@ fn main() {
         .build().unwrap();
 
     //Set up Exporter Address
-    let raw_addr = "0.0.0.0:9184";
+    let raw_addr = vec!["0.0.0.0",port_string].join(":");
     let addr : SocketAddr = raw_addr.parse().expect("Listening Address Could Not Be Parsed.");
 
     // Set up Metrics
@@ -178,7 +180,7 @@ fn main() {
 
         println!("{}", raw_resp);
 
-        let reading = get_reading(raw_resp);
+        let reading = get_reading(raw_resp, adjust_flag);
 
         // Update Atmospherics
         humidity_gauge.set(reading.atmo_sen_a[0].into());
