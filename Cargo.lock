@@ -765,6 +765,7 @@ dependencies = [
  "clap",
  "env_logger",
  "json",
+ "lazy_static",
  "log",
  "prometheus_exporter",
  "reqwest",

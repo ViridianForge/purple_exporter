@@ -48,7 +48,7 @@
         atmo_sen_vec[1] -= 8.0;
     }
 
-    //Need to convert this response into a proper form
+    // Convert this response into a proper form
     let reading = PurpleReading{
         atmo_sen_a: atmo_sen_vec,
         pm_sen_a: pm_sen_a_vec,
