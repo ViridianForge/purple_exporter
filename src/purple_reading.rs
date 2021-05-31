@@ -27,7 +27,7 @@
   /// # Arguments
   /// * `raw_resp` - Response from Purple Air API as a String
   /// # Returns
-  /// * `Reading` - A Reading struct parsed from `raw_resp`
+  /// * `PurpleReading` - A Reading struct parsed from `raw_resp`
   pub fn get_reading(raw_resp:String, adjust:bool) -> PurpleReading{
 
     // Convert Raw Response to JSON

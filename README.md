@@ -37,6 +37,13 @@ should be adjusted to reflect likely ambient readings rather than readings in
 the sensor housing. Sensor readings are, on average, 8F hotter and 4% drier.
 Valid values are `true` or `false`, and will default to `false`.
 
+### Logging
+
+Purple Exporter makes use of seanmonstar's [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) to
+provide activity logging.  In order to utilize this logging, set an environment
+variable, `RUST_LOG` to `info` or `trace` before executing cargo run as
+illustrated above.
+
 ### Exposed Metrics
 
 Metrics are collected from all sensors for which they are available.
