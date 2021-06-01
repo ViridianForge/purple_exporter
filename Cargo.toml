@@ -1,6 +1,6 @@
 [package]
 name = "purple_exporter"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Wayne Manselle <wayne@viridianforge.tech>"]
 edition = "2018"
 
