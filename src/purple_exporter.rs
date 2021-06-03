@@ -37,7 +37,7 @@ lazy_static! {
 /// # Arguments
 /// * `port_string` - Port Purple_Exporter will listen on
 /// # Returns
-/// * `Exporter` - Initialized `prometheus_exporter`
+/// * Initialized `prometheus_exporter`
 pub fn start_exporter(port_string: &str) -> prometheus_exporter::Exporter{
     //Set up Exporter Address
     let raw_addr = vec!["0.0.0.0",port_string].join(":");

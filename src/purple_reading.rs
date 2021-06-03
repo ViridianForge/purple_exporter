@@ -27,7 +27,7 @@
   /// # Arguments
   /// * `raw_resp` - Response from Purple Air API as a String
   /// # Returns
-  /// * `PurpleReading` - A Reading struct parsed from `raw_resp`
+  /// * A PurpleReading struct parsed from `raw_resp`
   pub fn get_reading(raw_resp:String, adjust:bool) -> PurpleReading{
 
     // Convert Raw Response to JSON
@@ -65,7 +65,7 @@
   /// * `sensor_response` - All Purple Air Sensor readings, as a JSON object
   /// * `keys` - `Vec<String>` of keys in `sensor_response` to assemble into returned array
   /// # Returns
-  /// * `Vec<f32>` - values associated with `keys` as `f32`. Values default to `-1.0` if the transformation fails.
+  /// * Vec of values associated with `keys` as `f32`. Values default to `-1.0` if the transformation fails.
   fn parse_response(sensor_response:&json::JsonValue, keys:Vec<String>) -> Vec<f32>{
     return keys.iter().map(|index| sensor_response[index].as_f32().unwrap_or(-1.0)).collect();
   }

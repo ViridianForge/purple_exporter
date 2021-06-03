@@ -3,6 +3,12 @@ name = "purple_exporter"
 version = "0.6.0"
 authors = ["Wayne Manselle <wayne@viridianforge.tech>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A Prometheus Exporter for PurpleAir Sensors"
+homepage = "https://github.com/ViridianForge/purple_exporter"
+repository = "https://github.com/ViridianForge/purple_exporter"
+keywords = ["Purple Air", "Prometheus Exporter", "Air Quality"]
+categories = ["prometheus", "metrics"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

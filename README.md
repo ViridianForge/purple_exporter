@@ -19,25 +19,48 @@ sensor.
 
 ## Running the Exporter
 
-To start the exporter from the command line:
-`cargo run -- -r rate -s sensor_index -x API_read_key -p port -a adjust`
+### Configuring the Exporter
 
-Where `rate` is how often to query the purple air API, in seconds. This will
+The exporter is configurable using the values below, specified via environmental
+variable, or command line argument.
+
+#### Sensor Index
+
+Set with the `SENSOR_ID` environment variable, or the `-s` flag.
+This value is the unique index assigned by PurpleAir to the sensor that readings
+will be drawn from.
+
+#### API Read Key
+
+Set with the `READ_KEY` environment variable, or the `-x` flag.
+This is one of the two API keys PurpleAir will furnish when following the above
+directions.
+
+#### Request Rate
+
+Set with the `REQUEST_RATE` environment variable, or the `-r` flag.
+This is how often to query the purple air API, in seconds. This will
 default to a minimum of once every 300 seconds (5 minutes).
 
-`sensor_index` is the unique index assigned by Purple to the sensor to draw
-readings from.
+#### Network Port
 
-`API_read_key` is the Purple Air API Key mentioned above.
+Set with the `PORT` environment variable, or the `-p` flag.
+This is the network port the exporter will serve its data from.
 
-`port` is the network port the exporter will serve its data from.
+#### Environmental Adjustment
 
-`adjust` is a flag used to indicate whether humidity and temperature readings
+Set with the `ADJUST` environment variable, or the `-a` flag.
+This flag is used to indicate whether humidity and temperature readings
 should be adjusted to reflect likely ambient readings rather than readings in
 the sensor housing. Sensor readings are, on average, 8F hotter and 4% drier.
 Valid values are `true` or `false`, and will default to `false`.
 
-### Logging
+### Running the exporter from Cargo
+
+To start the exporter from the command line:
+`cargo run -- -r rate -s sensor_index -x API_read_key -p port -a adjust`
+
+### Exporter Logging
 
 Purple Exporter makes use of seanmonstar's [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) to
 provide activity logging.  In order to utilize this logging, set an environment

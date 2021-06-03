@@ -1,6 +1,12 @@
 use std::env;
 
-/// Docs go here
+/// Representation of a Purple Exporter Configuration
+/// # Fields
+/// * `sensor_id` - unique sensor ID to request readings from
+/// * `read_key` - API read key used to authenticate with Purple API
+/// * `query_rate` - Rate (in seconds) at which to query Purple API (min: 300)
+/// * `port` - The network port to serve the exporter on
+/// * `adjust` - Flag, true if measurements should be adjusted for air temperature and pressure
 pub struct Config {
   pub sensor_id: String,
   pub read_key: String,
@@ -9,9 +15,12 @@ pub struct Config {
   pub adjust: bool
 }
 
-/// Docs go here
+/// Creates exporter configuration based on environment variables, falling back
+/// to command line arguments if a critical environment variable is not set.
+/// # Returns
+/// * Config struct parsed from args
 pub fn load_config() -> Config{
-  let env_var_not_set = env::var("SENSOR_ID").is_err();
+  let env_var_not_set = env::var("SENSOR_ID").is_err() ;
   if env_var_not_set{
     return config_from_args();
   } else {
@@ -19,13 +28,16 @@ pub fn load_config() -> Config{
   }
 }
 
-/// Docs go here
+/// Creates Exporter Configuration based on environment variables set when
+/// exporter is started.
+/// # Returns
+/// * Config struct parsed from environment variables
 fn config_from_env() -> Config{
   // Required Environment Variables
   let sensor_id = env::var("SENSOR_ID").unwrap();
   let read_key = env::var("READ_KEY").unwrap();
   // Optional Environment Variables
-  let query_rate = env::var("QUERY_RATE").unwrap_or(String::from("300"));
+  let query_rate = env::var("REQUEST_RATE").unwrap_or(String::from("300"));
   let port = env::var("PORT").unwrap_or(String::from("9184"));
   let adjust = env::var("ADJUST").unwrap_or(String::from("false"));
 
@@ -44,7 +56,10 @@ fn config_from_env() -> Config{
   return config;
 }
 
-/// Docs go here
+/// Creates Exporter Configuration based on command line arguments passed at 
+/// execution time.
+/// # Returns
+/// * Config struct parsed from args
 fn config_from_args() -> Config{
   let args = clap_app!(myapp => 
     (version: "0.6.0")
