@@ -94,4 +94,4 @@ Metrics are collected from all sensors for which they are available.
 
 ## References
 
-[https://api.purpleair.com/#api-welcome](PurpleAir API docs)
+[PurpleAir API docs](https://api.purpleair.com/#api-welcome)
