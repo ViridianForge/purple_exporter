@@ -57,8 +57,26 @@ Valid values are `true` or `false`, and will default to `false`.
 
 ### Running the exporter from Cargo
 
-To start the exporter from the command line:
 `cargo run -- -r rate -s sensor_index -x API_read_key -p port -a adjust`
+
+### Building the Purple Exporter as an executable
+
+`cargo build --release`
+
+The resulting executable will be placed in `<path_to_repo>/target/release/`.
+
+### Building the Docker Image
+
+If running from the repository root:
+`docker build -t <tag> .`
+
+This will result in a trimmed down alpine linux image with a statically compiled executable.
+
+### Running the Docker Image
+
+`docker run --env-file .env <image>`
+
+An example environment variable file is provided in `.env.example`.
 
 ### Exporter Logging
 

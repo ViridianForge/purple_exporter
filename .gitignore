@@ -1,1 +1,5 @@
+# Build Folders
 /target
+
+# Local Testing Environment File
+.env.local
