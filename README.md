@@ -2,8 +2,8 @@
 
 [![MIT Licensed][license-badge]][license-url]
 
-[license-badge](https://img.shields.io/badge/License-MIT-yellow.svg)
-[license-url](https://opensource.org/licenses/MIT)]
+[license-badge]: https://img.shields.io/badge/License-MIT-yellow.svg
+[license-url]: LICENSE
 
 Exporting metrics from the PurpleAir API for your PurpleAir Sensor.
 
@@ -13,25 +13,25 @@ This is where a link to the latest relase will go.
 
 1. [Description](#description)
 2. [Technical Details](#technical-details)
-  2.1 [Exposed Metrics](#exposed-metrics)
-    2.1.1 [Environmental Data](#environmental-data)
-    2.1.2 [Estimated Mass Concentrations](#estimated-mass-concentrations)
-    2.1.3 [Particle Concentrations](#particle-concentrations)
+    1. [Exposed Metrics](#exposed-metrics)
+        1. [Environmental Data](#environmental-data)
+        2. [Estimated Mass Concentrations](#estimated-mass-concentrations)
+        3. [Particle Concentrations](#particle-concentrations)
 3. [Building Purple Exporter](#building-purple-exporter)
-  3.1 [Getting an API Key](#getting-an-api-key)
-  3.2 [Building from Source](#building-from-source)
-  3.3 [Building Docker Image](#building-docker-image)
+    1. [Getting an API Key](#getting-an-api-key)
+    2. [Building from Source](#building-from-source)
+    3. [Building Docker Image](#building-docker-image)
 4. [Required Configuration](#required-configuration)
-  4.1 [Sensor Index](#sensor-index)
-  4.2 [API Read Key](#api-read-key)
-  4.3 [Request Rate](#request-rate)
-  4.4 [Network Port](#network-port)
-  4.5 [Environmental Adjustment](#environmental-adjustment)
-  4.6 [Log Level](log-level)
+    1. [Sensor Index](#sensor-index)
+    2. [API Read Key](#api-read-key)
+    3. [Request Rate](#request-rate)
+    4. [Network Port](#network-port)
+    5. [Environmental Adjustment](#environmental-adjustment)
+    6. [Log Level](log-level)
 5. [Running Purple Exporter](#running-purple-exporter)
-  5.1 [Running from Source](#running-from-source)
-  5.2 [Running from Executable](#running-from-executable)
-  5.3 [Running from Docker](#running-from-docker)
+    1. [Running from Source](#running-from-source)
+    2. [Running from Executable](#running-from-executable)
+    3. [Running from Docker](#running-from-docker)
 6. [Testing](#testing)
 7. [License](#license)
 8. [References](#references)
