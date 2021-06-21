@@ -1,9 +1,12 @@
 # purple_exporter
 
 [![MIT Licensed][license-badge]][license-url]
+[![GitHub Super-Linter][linter-badge]][linter-url]
 
 [license-badge]: https://img.shields.io/badge/License-MIT-yellow.svg
 [license-url]: LICENSE
+[linter-badge]: https://github.com/viridianforge/purple_exporter/workflows/Lint%20Code%20Base/badge.svg
+[linter-url]: https://github.com/marketplace/actions/super-linter
 
 Exporting metrics from the PurpleAir API for your PurpleAir Sensor.
 
@@ -149,7 +152,7 @@ purple_exporter. Options include: `info` or `trace`.
 
 or by setting environment variables.
 
-### Running the Docker Image
+### Running from Docker
 
 `docker run --env-file .env <image>`
 
