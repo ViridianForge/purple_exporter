@@ -35,9 +35,10 @@ This is where a link to the latest relase will go.
     1. [Running from Source](#running-from-source)
     2. [Running from Executable](#running-from-executable)
     3. [Running from Docker](#running-from-docker)
-6. [Testing](#testing)
-7. [License](#license)
-8. [References](#references)
+6. [Grafana](#grafana)
+7. [Testing](#testing)
+8. [License](#license)
+9. [References](#references)
 
 ## Description
 
@@ -63,9 +64,9 @@ Metrics are collected from all sensors for which they are available.
 
 #### Estimated Mass Concentrations
 
-- pm1.0: Estimated mass concentration of particles less than 1 uM in diameter. (ug/m)
-- pm2.5: Estimated mass concentration of particles less than 2.5 uM in diameter. (ug/m)
-- pm10.0: Estimated mass concentration of particles less than 10.0 uM in diameter. (ug/m)
+- pm1.0: Estimated mass concentration of particles less than 1 uM in diameter. (ug/m^3)
+- pm2.5: Estimated mass concentration of particles less than 2.5 uM in diameter. (ug/m^3)
+- pm10.0: Estimated mass concentration of particles less than 10.0 uM in diameter. (ug/m^3)
 
 #### Partical Concentrations
 
@@ -158,6 +159,14 @@ or by setting environment variables.
 
 An example environment variable file is provided in `.env.example`.
 
+## Grafana
+
+A Grafana dashboard for use with this exporter is available from the [Grafana
+community library](https://grafana.com/grafana/dashboards/14723).
+
+For direct importing into a Grafana instance, please use the packaged
+[dashboard.json](./dashboards/dashboard.json).
+
 ## Testing
 
 Work in Progress
@@ -170,4 +179,4 @@ Work in Progress
 
 - [PurpleAir API docs](https://api.purpleair.com/#api-welcome)
 - Purple_Exporter makes use of seanmonstar's [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) to
-provide activity logging.  
+provide activity logging.
