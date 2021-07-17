@@ -165,7 +165,7 @@ A Grafana dashboard for use with this exporter is available from the [Grafana
 community library](https://grafana.com/grafana/dashboards/14723).
 
 For direct importing into a Grafana instance, please use the packaged
-[dashboard.json](./dashboard.json).
+[dashboard.json](./dashboards/dashboard.json).
 
 ## Testing
 
