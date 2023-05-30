@@ -16,7 +16,7 @@ categories = ["prometheus", "metrics"]
 clap = "2.33.3"
 json = "0.12.4"
 lazy_static = "1.4.0"
-log = "0.4.17"
+log = "0.4.18"
 pretty_env_logger = "0.5"
 prometheus_exporter = "0.8"
 reqwest = { version = "0.11", features = ["blocking"]}
